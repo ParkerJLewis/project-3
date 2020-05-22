@@ -1,20 +1,24 @@
 // jshint esversion: 6
-
+//failhandler
+let failHandler = () => {
+  console.log("Fail -- unknown breed");
+  $(".photos").empty().html("<h3>Error -- breed not found <h3>");
+};
 //1. Define the onclick handler
 let clickHandler = function() {
   let imgElem;
-  let prefixURL =
-    'http://api.flickr.com/services/feeds/photos_public.gne?tags=';
-  let suffixURL = '&format=json&jsoncallback=?';
+  let prefixURL = 'https://dog.ceo/api/breed/';
+  let suffixURL = '/images/random/6';
   //get value entered by user from textbox
-  let flickrTag = document.querySelector('input[type = "text"]').value;
-  let requestURL = prefixURL + flickrTag + suffixURL;
+  let breedTag = (document.querySelector('input[type = "text"]').value).toLowerCase();
+  let requestURL = prefixURL + breedTag + suffixURL;
+  console.log(requestURL);
 
   //clear old photos
   document.querySelector('.photos').innerHTML = '';
 
-  $.getJSON(requestURL, function(flickrResponse) {
-    flickrResponse.items.forEach(function(item, index) {
+  $.getJSON(requestURL, function(dogAPIresponse) {
+    dogAPIresponse.message.forEach(function(imgURL, index) {
       //Flickr returns 20 images by default
       //We need only six images for the Gallery
       if (index < 6) {
@@ -24,7 +28,7 @@ let clickHandler = function() {
         imgElem.hidden = true;
 
         // set the attribute to the response url
-        imgElem.setAttribute('src', item.media.m);
+        imgElem.setAttribute('src', imgURL);
         imgElem.setAttribute('width', '100');
 
         // attach the img tag to the main
@@ -33,7 +37,7 @@ let clickHandler = function() {
         imgElem.hidden = false;
       }
     });
-  });
+  }).fail(failHandler);
 };
 
 //2. Register the onclick handler for each button after the DOM is complete
